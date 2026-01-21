@@ -1,3 +1,12 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ * POWERED BY SURITARGETS N.V. - PROPRIETARY SOFTWARE
+ * ═══════════════════════════════════════════════════════════
+ * Copyright © 2026 Suritargets N.V. All Rights Reserved.
+ * Unauthorized copying, distribution, or modification is strictly prohibited.
+ * ═══════════════════════════════════════════════════════════
+ */
+
 import React, { useState, useEffect } from 'react';
 
 interface LogEntry {

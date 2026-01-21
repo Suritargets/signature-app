@@ -1,5 +1,18 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ * POWERED BY SURITARGETS N.V. - PROPRIETARY SOFTWARE
+ * ═══════════════════════════════════════════════════════════
+ * Copyright © 2026 Suritargets N.V. All Rights Reserved.
+ * Unauthorized copying, distribution, or modification is strictly prohibited.
+ * ═══════════════════════════════════════════════════════════
+ */
+
 import { list } from '@vercel/blob';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+/* ═══════════════════════════════════════════════════════════
+ * SURITARGETS N.V. - ADMIN ANALYTICS ENDPOINT
+ * ═══════════════════════════════════════════════════════════ */
 
 // Hardcoded credentials
 const ADMIN_USERNAME = 'Ken';

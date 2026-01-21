@@ -1,3 +1,11 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ * POWERED BY SURITARGETS N.V. - PROPRIETARY SOFTWARE
+ * ═══════════════════════════════════════════════════════════
+ * Copyright © 2026 Suritargets N.V. All Rights Reserved.
+ * Unauthorized copying, distribution, or modification is strictly prohibited.
+ * ═══════════════════════════════════════════════════════════
+ */
 
 export interface LocationData {
   name: string;

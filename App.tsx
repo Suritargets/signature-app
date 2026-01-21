@@ -1,9 +1,23 @@
+/**
+ * ═══════════════════════════════════════════════════════════
+ * POWERED BY SURITARGETS N.V. - PROPRIETARY SOFTWARE
+ * ═══════════════════════════════════════════════════════════
+ * Copyright © 2026 Suritargets N.V. All Rights Reserved.
+ * This software is the proprietary property of Suritargets N.V.
+ * Unauthorized copying, distribution, or modification is strictly prohibited.
+ * ═══════════════════════════════════════════════════════════
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { SignatureData, DEFAULT_SIGNATURE } from './types';
 import SignaturePreview from './components/SignaturePreview';
 import Editor from './components/Editor';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
+
+/* ═══════════════════════════════════════════════════════════
+ * SURITARGETS N.V. - PROTECTED CODE
+ * ═══════════════════════════════════════════════════════════ */
 
 const App: React.FC = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
