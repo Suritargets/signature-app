@@ -1,19 +1,68 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SignatureData, DEFAULT_SIGNATURE } from './types';
 import SignaturePreview from './components/SignaturePreview';
 import Editor from './components/Editor';
+import AdminLogin from './components/AdminLogin';
+import AdminDashboard from './components/AdminDashboard';
 
 const App: React.FC = () => {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [data, setData] = useState<SignatureData>(DEFAULT_SIGNATURE);
   const [copied, setCopied] = useState(false);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [consentGiven, setConsentGiven] = useState(false);
   const signatureRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  // Reset consent when signature data changes
+  useEffect(() => {
+    // Skip the first render to avoid resetting on initial load
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    
+    // Any change to signature data resets consent
+    setConsentGiven(false);
+  }, [data]);
+
+  // Listen for popstate events (back/forward navigation)
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Track user data on page load (only for main app, not admin)
+  useEffect(() => {
+    if (currentPath !== '/STADMIN') {
+      trackUserVisit();
+    }
+  }, []);
+
+  const trackUserVisit = async () => {
+    try {
+      await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          signatureData: data,
+          hasCopied: false
+        })
+      });
+    } catch (error) {
+      console.error('Failed to track visit:', error);
+    }
+  };
 
   const handleCopy = async () => {
-    if (!signatureRef.current) return;
+    if (!signatureRef.current || !consentGiven) return;
     
     const range = document.createRange();
     range.selectNode(signatureRef.current);
@@ -25,6 +74,16 @@ const App: React.FC = () => {
       document.execCommand('copy');
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+
+      // Track the copy action
+      await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          signatureData: data,
+          hasCopied: true
+        })
+      });
     } catch (err) {
       console.error('Failed to copy signature:', err);
     }
@@ -91,6 +150,19 @@ const App: React.FC = () => {
     </div>
   );
 
+  // Admin panel routing
+  if (currentPath === '/STADMIN') {
+    if (!isAdminAuthenticated) {
+      return <AdminLogin onLogin={setIsAdminAuthenticated} />;
+    }
+    return <AdminDashboard onLogout={() => {
+      setIsAdminAuthenticated(false);
+      window.history.pushState({}, '', '/');
+      setCurrentPath('/');
+    }} />;
+  }
+
+  // Main signature app
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden font-sans">
       <style>{`
@@ -233,14 +305,41 @@ const App: React.FC = () => {
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
            <Editor data={data} onChange={setData} />
            
-           <div className="pt-8">
+           <div className="pt-8 space-y-4">
+              {/* Consent Checkbox */}
+              <div className="bg-white border-2 border-gray-200 rounded-2xl p-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={consentGiven}
+                    onChange={(e) => setConsentGiven(e.target.checked)}
+                    className="mt-1 w-5 h-5 rounded border-2 border-gray-300 text-[#002060] focus:ring-2 focus:ring-[#002060] cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-gray-800 leading-relaxed">
+                      Ik ga akkoord dat de ingevulde gegevens correct zijn en de preview er goed uitziet.
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {/* Copy Button */}
               <button
                 onClick={handleCopy}
-                className={`w-full flex items-center justify-center gap-3 px-8 py-5 ${
-                  copied ? 'bg-green-600' : 'bg-[#c62828]'
-                } text-white font-bold text-lg rounded-2xl transition-all hover:brightness-110 active:scale-[0.98] shadow-xl shadow-red-200/50`}
+                disabled={!consentGiven}
+                className={`w-full flex items-center justify-center gap-3 px-8 py-5 font-bold text-lg rounded-2xl transition-all shadow-xl ${
+                  copied 
+                    ? 'bg-green-600 text-white hover:brightness-110 active:scale-[0.98] shadow-green-200/50' 
+                    : !consentGiven 
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed shadow-gray-200/30 opacity-60' 
+                      : 'bg-[#c62828] text-white hover:brightness-110 active:scale-[0.98] shadow-red-200/50'
+                }`}
               >
-                {copied ? <><i className="fas fa-check-double"></i> Gekopieerd!</> : <><i className="fas fa-copy"></i> Kopieer Handtekening</>}
+                {copied ? (
+                  <><i className="fas fa-check-double"></i> Gekopieerd!</>
+                ) : (
+                  <><i className="fas fa-copy"></i> Kopieer Handtekening</>
+                )}
               </button>
            </div>
         </div>
