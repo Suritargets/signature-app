@@ -1,0 +1,63 @@
+DEVELOPER DOCUMENTATION: SURITARGETS BRANDING TOOL V2.0
+======================================================
+
+1. PROJECTOVERZICHT
+-------------------
+De Suritargets Branding Tool is een high-end, client-side webapplicatie gebouwd met React 19 en Tailwind CSS. Het is specifiek ontworpen om professionele, 
+HTML-geoptimaliseerde e-mailhandtekeningen te genereren die consistent worden weergegeven in clients zoals Outlook, Gmail en Apple Mail.
+
+2. INSTALLATION GUIDE
+---------------------
+Systeemvereisten:
+- Node.js: v18.0.0 of hoger.
+- Browser: Moderne browser met ondersteuning voor ES6 modules (Chrome, Edge, Safari, Firefox).
+
+Lokale Installatie:
+De app laadt React direct via esm.sh. Voor een volledige development setup:
+1. Clone het project.
+2. Navigeer naar de root directory.
+3. Start een development server (bijv. Vite): npx vite
+4. Productie Build: npx vite build
+
+3. FEATURES
+-----------
+- Real-time WYSIWYG Editor: Wijzigingen in de editor worden direct doorgevoerd in de preview.
+- Dynamic Visibility (Show/Hide): Bijna elk element (Naam, Logo, QR, Slogan, etc.) heeft een dedicated toggle om de handtekening te minimaliseren.
+- Thema Engine: Ondersteuning voor meerdere layouts (Modern, Compact, Mobile-stack).
+- Branding Customization: Volledige controle over Primaire, Secundaire en Accent kleuren.
+- Image Handling: Ondersteuning voor zowel externe URL's als Base64 uploads voor Logo's en Profielfoto's.
+- Background Pitch: Geavanceerde opties voor achtergrondafbeeldingen (opacity, mirroring, positioning).
+- Email-Safe HTML: De preview genereert geneste tabellen met inline-CSS voor maximale compatibiliteit met e-mailclients.
+- QR Code Integratie: Automatische generatie van een QR-code op basis van de ingevoerde website URL via de api.qrserver.com API.
+
+4. TECHNICAL SPECIFICATIONS
+---------------------------
+Architectuur:
+De applicatie is opgedeeld in drie hoofdcomponenten:
+1. App.tsx: Beheert de globale state (SignatureData) en de layout van de tool.
+2. Editor.tsx: Bevat alle UI-controls, gegroepeerd in geanimeerde accordions.
+3. SignaturePreview.tsx: De "Engine". Vertaalt de JSON-data naar een complexe HTML-tabelstructuur.
+
+Data Model (types.ts):
+- SignatureData: Single source of truth voor alle handtekening-instellingen.
+- LayoutTheme: Enum voor de gekozen visuele structuur.
+- LocationData: Array van objecten voor multi-office support.
+
+Styling Strategie:
+- UI: Tailwind CSS voor de editor en toolbar.
+- Signature Preview: Strikt inline CSS. Geen classes of externe stylesheets. Gebruik van table, tr en td is verplicht voor layout-behoud in Outlook.
+
+Alignment Logica:
+De 'signatureAlign' property stuurt zowel de CSS 'textAlign' aan als de 'marginLeft/Right: auto' logica op de tabellen zelf om center-alignment in alle clients te garanderen.
+
+5. DEVELOPMENT GUIDE & BEST PRACTICES
+-------------------------------------
+- Email Compatibility: Gebruik NOOIT flexbox of grid in de SignaturePreview. Gebruik uitsluitend tabellen.
+- Iconen: Worden gerenderd als gekleurde div-blokken met symbolen om te voorkomen dat ze als bijlage worden gezien of geblokkeerd worden door security filters.
+- State Updates: Gebruik de onChange prop om de state in App.tsx op een immutable manier te updaten.
+
+6. DEPLOYMENT
+-------------
+De tool is volledig statisch. De build output (dist folder) kan op elke webserver worden gehost (Vercel, Netlify, Apache, Nginx).
+
+Branding Tool v2.0 © 2025 Suritargets B.V.
